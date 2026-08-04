@@ -1,0 +1,41 @@
+openapi: 3.1.0
+
+info:
+  title: Investment Portfolio Tracker API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+
+# Apply Bearer authentication to all endpoints
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Instruments
+    description: Manage investment instruments
+
+paths:
+  /instruments:
+    post:
+      tags:
+        - Instruments
+      summary: Create an instrument
+      description: Creates a new investment instrument.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              categoryId: 2
+              instrumentName: SANABEL
+      responses:
+        '201':
+          message: Instrument Created Successfully
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

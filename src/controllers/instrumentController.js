@@ -8,16 +8,18 @@ class InstrumentController {
   }
 
   async createInstrument(req, res, next) {
-    const { category, name } = req.body;
-    if (!category) {
-      throw createHttpError.BadRequest("Category is required");
+    const { categoryId, instrumentName } = req.body;
+    if (!categoryId) {
+      throw createHttpError.BadRequest("Category ID is required");
     }
-    if (!name) {
-      throw createHttpError.BadRequest("Name is required");
+    if (!instrumentName) {
+      throw createHttpError.BadRequest("Instrument name is required");
     }
+    const userId = req.userId;
     const result = await this.instrumentService.createInstrument(
-      category,
-      name,
+      userId,
+      categoryId,
+      instrumentName,
     );
     return res.status(200).json({ message: result });
   }

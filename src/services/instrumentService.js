@@ -5,22 +5,20 @@ class InstrumentService {
     this.supaBaseClient = supaBaseClient;
   }
 
-  async createInstrument(category, name) {
+  async createInstrument(userId, categoryId, instrumentName) {
     const { data, error } = await this.supaBaseClient
       .from("instruments")
       .insert({
-        user_id: req.user.id, // assuming your auth middleware sets this
-        category,
-        name,
+        user_id: userId, // assuming your auth middleware sets this
+        category_id: categoryId,
+        name: instrumentName,
       });
 
-    console.log("createInstrument data:", data);
     if (error) {
-      console.log("H2: ");
       console.error("Create Instrument Error:", error);
       throw createHttpError.InternalServerError("Failed to create instrument");
     }
-    return "instrument created successfully";
+    return "Instrument Created Successfully";
   }
 }
 module.exports = InstrumentService;

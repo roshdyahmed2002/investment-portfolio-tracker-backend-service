@@ -13,12 +13,10 @@ class AuthController {
         if (!password) {
             throw createHttpError.BadRequest("Password is required");
         }
-        console.log("login request body:", req.body)
         const { data, error } = await this.supaBaseClient.auth.signInWithPassword({
             email,
             password
         });
-        console.log("login data:", data)
         if (error) {
             throw createHttpError.Unauthorized(error.message);
         }

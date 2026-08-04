@@ -1,2 +1,3 @@
 const InstrumentService = require("./instrumentService");
-module.exports = { InstrumentService };
+const CategoryService = require("./categoryService");
+module.exports = { InstrumentService, CategoryService };
