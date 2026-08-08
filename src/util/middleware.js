@@ -17,7 +17,7 @@ function authenticate(supaBaseClient) {
       throw createHttpError.Unauthorized("Invalid token");
     }
     req.userId = user?.id;
-    if(!req.userId) {
+    if (!req.userId) {
       throw createHttpError.Unauthorized("User ID not found in token");
     }
     return next();
