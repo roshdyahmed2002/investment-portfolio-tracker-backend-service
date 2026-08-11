@@ -1,9 +1,10 @@
 const createHttpError = require("http-errors");
 const TransactionAction = require("../constansts/transactionActions");
+const { TransactionRepository } = require("../repository");
 
 class TransactionService {
-  constructor(transactionRepository) {
-    this.transactionRepository = transactionRepository;
+  constructor(supaBaseClient) {
+    this.transactionRepository = new TransactionRepository(supaBaseClient);
   }
 
   async createTransaction({
@@ -183,7 +184,7 @@ class TransactionService {
     }
 
     for (const [key, value] of Object.entries(disallowed)) {
-      if (value !== undefined && value !== null) {
+      if (value) {
         throw createHttpError.BadRequest(`${key} must be null`);
       }
     }
