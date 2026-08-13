@@ -4,6 +4,7 @@ const {
   TransactionRepository,
   InstrumentRepository,
 } = require("../repository");
+const { responseBuilder } = require("../util/responseBuilder");
 
 class TransactionService {
   constructor(supaBaseClient) {
@@ -186,16 +187,67 @@ class TransactionService {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    return await this.transactionRepository.getTransactionsByUserId({
-      userId,
-      from,
-      to,
-      action,
-      instrumentId,
-      date,
-      fromDate,
-      toDate,
+    const { data, count } =
+      await this.transactionRepository.getTransactionsByUserId({
+        userId,
+        from,
+        to,
+        action,
+        instrumentId,
+        date,
+        fromDate,
+        toDate,
+      });
+    const transactions = this.mapTransaction(data);
+    const totalPages = count === null ? null : Math.ceil(count / limit);
+
+    return {
+      transactions,
+      metaData: {
+        page,
+        limit,
+        totalItems: count,
+        totalPages,
+      },
+    };
+  }
+
+  mapTransaction(transactions) {
+    return transactions.map((transaction) => {
+      return {
+        id: transaction.id,
+        txnDate: transaction.txn_date,
+        action: transaction.action,
+        units: transaction.units,
+        price: transaction.price,
+        dividendCash: transaction.dividend_cash,
+        dividendSharesRatio: transaction.dividend_shares_ratio,
+        realizedPl: transaction.realized_pl,
+        realizedPlPercentage: this.calculateRealizedPlPercentage(
+          transaction.units,
+          transaction.price,
+          transaction.dividend_cash,
+          transaction.dividend_shares_ratio,
+          transaction.realized_pl,
+        ),
+        instrument: transaction.instruments.name,
+        category: transaction.instruments.categories.name,
+      };
     });
+  }
+
+  calculateRealizedPlPercentage(
+    units,
+    price,
+    dividendCash,
+    dividendSharesRatio,
+    realizedPl,
+  ) {
+    if (dividendCash || dividendSharesRatio) {
+      return 0;
+    } else {
+      return (realizedPl / (units * price)) * 100;
+    }
   }
 }
 

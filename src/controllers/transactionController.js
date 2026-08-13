@@ -1,6 +1,7 @@
 const createHttpError = require("http-errors");
 const { TransactionService } = require("../services");
 const TransactionAction = require("../constansts/transactionActions");
+const { responseBuilder } = require("../util/responseBuilder");
 
 class TransactionController {
   constructor(supaBaseClient) {
@@ -58,19 +59,21 @@ class TransactionController {
 
   async getTransactionsByUserId(req, res, next) {
     const userId = req.userId;
-    const { page, limit, action, instrumentId, date, fromDate, toDate } =
-      req.query;
-    const transactions = await this.transactionService.getTransactionsByUserId({
-      userId,
-      action,
-      instrumentId,
-      date,
-      fromDate,
-      toDate,
-      page,
-      limit,
-    });
-    return res.status(200).json({ transactions });
+    const { action, instrumentId, date, fromDate, toDate } = req.query;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const { transactions, metaData } =
+      await this.transactionService.getTransactionsByUserId({
+        userId,
+        action,
+        instrumentId,
+        date,
+        fromDate,
+        toDate,
+        page,
+        limit,
+      });
+    return res.status(200).json(responseBuilder(transactions, metaData));
   }
 }
 module.exports = TransactionController;

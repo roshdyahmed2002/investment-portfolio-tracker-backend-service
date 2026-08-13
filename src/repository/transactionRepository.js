@@ -125,9 +125,14 @@ class TransactionRepository {
         instruments (
             id,
             name,
-            category
+            category_id,
+            categories (
+                id,
+                name
+            )
         )
     `,
+        { count: "exact" },
       )
       .eq("user_id", userId)
       .order("txn_date", { ascending: false })
@@ -149,13 +154,18 @@ class TransactionRepository {
       query = query.lte("txn_date", toDate);
     }
 
-    const { data, error } = await query;
+    const { data, count, error } = await query;
 
     if (error) {
+      if (error.code === "PGRST103") {
+        return {
+          data: [],
+          count: null,
+        };
+      }
       throw error;
     }
-
-    return data;
+    return { data, count };
   }
 }
 
