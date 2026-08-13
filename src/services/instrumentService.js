@@ -1,24 +1,19 @@
-const createHttpError = require("http-errors");
+const { InstrumentRepository } = require("../repository");
 
 class InstrumentService {
   constructor(supaBaseClient) {
-    this.supaBaseClient = supaBaseClient;
+    this.instrumentRepository = new InstrumentRepository(supaBaseClient);
   }
 
   async createInstrument(userId, categoryId, instrumentName) {
-    const { data, error } = await this.supaBaseClient
-      .from("instruments")
-      .insert({
-        user_id: userId, // assuming your auth middleware sets this
-        category_id: categoryId,
-        name: instrumentName,
-      });
+    await this.instrumentRepository.createInstrument({
+      userId,
+      categoryId,
+      instrumentName,
+    });
 
-    if (error) {
-      console.error("Create Instrument Error:", error);
-      throw createHttpError.InternalServerError("Failed to create instrument");
-    }
     return "Instrument Created Successfully";
   }
 }
+
 module.exports = InstrumentService;

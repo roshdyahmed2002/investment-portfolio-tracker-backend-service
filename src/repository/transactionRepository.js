@@ -99,19 +99,63 @@ class TransactionRepository {
     return data;
   }
 
-  async getInstrumentUnits(instrumentId, userId) {
-    const { data, error } = await this.supaBaseClient
-      .from("instruments")
-      .select("units_held")
-      .eq("id", instrumentId)
+  async getTransactionsByUserId({
+    userId,
+    from,
+    to,
+    action,
+    instrumentId,
+    date,
+    fromDate,
+    toDate,
+  }) {
+    let query = this.supaBaseClient
+      .from("transactions")
+      .select(
+        `
+        id,
+        txn_date,
+        action,
+        units,
+        price,
+        dividend_cash,
+        dividend_shares_ratio,
+        realized_pl,
+        instrument_id,
+        instruments (
+            id,
+            name,
+            category
+        )
+    `,
+      )
       .eq("user_id", userId)
-      .single();
+      .order("txn_date", { ascending: false })
+      .range(from, to);
+
+    if (action) {
+      query = query.eq("action", action);
+    }
+    if (instrumentId) {
+      query = query.eq("instrument_id", instrumentId);
+    }
+    if (date) {
+      query = query.eq("txn_date", date);
+    }
+    if (fromDate) {
+      query = query.gte("txn_date", fromDate);
+    }
+    if (toDate) {
+      query = query.lte("txn_date", toDate);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       throw error;
     }
 
-    return data.units_held;
+    return data;
   }
 }
 

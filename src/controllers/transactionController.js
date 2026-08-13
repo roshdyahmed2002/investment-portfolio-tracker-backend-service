@@ -55,5 +55,22 @@ class TransactionController {
       throw createHttpError.BadRequest("Transaction date is required");
     }
   }
+
+  async getTransactionsByUserId(req, res, next) {
+    const userId = req.userId;
+    const { page, limit, action, instrumentId, date, fromDate, toDate } =
+      req.query;
+    const transactions = await this.transactionService.getTransactionsByUserId({
+      userId,
+      action,
+      instrumentId,
+      date,
+      fromDate,
+      toDate,
+      page,
+      limit,
+    });
+    return res.status(200).json({ transactions });
+  }
 }
 module.exports = TransactionController;

@@ -1,10 +1,14 @@
 const createHttpError = require("http-errors");
 const TransactionAction = require("../constansts/transactionActions");
-const { TransactionRepository } = require("../repository");
+const {
+  TransactionRepository,
+  InstrumentRepository,
+} = require("../repository");
 
 class TransactionService {
   constructor(supaBaseClient) {
     this.transactionRepository = new TransactionRepository(supaBaseClient);
+    this.instrumentRepository = new InstrumentRepository(supaBaseClient);
   }
 
   async createTransaction({
@@ -68,20 +72,13 @@ class TransactionService {
       { dividendCash, dividendSharesRatio },
     );
 
-    try {
-      await this.transactionRepository.createBuyTransaction({
-        userId,
-        instrumentId,
-        units,
-        price,
-        transactionDate,
-      });
-    } catch (error) {
-      console.error("Create Buy Transaction Error:", error);
-      throw createHttpError.InternalServerError(
-        "Failed to create buy transaction",
-      );
-    }
+    await this.transactionRepository.createBuyTransaction({
+      userId,
+      instrumentId,
+      units,
+      price,
+      transactionDate,
+    });
   }
 
   async createSellTransaction(
@@ -93,20 +90,24 @@ class TransactionService {
       { dividendCash, dividendSharesRatio },
     );
 
-    try {
-      await this.transactionRepository.createSellTransaction({
-        userId,
-        instrumentId,
-        units,
-        price,
-        transactionDate,
-      });
-    } catch (error) {
-      console.error("Create Sell Transaction Error:", error);
-      throw createHttpError.InternalServerError(
-        "Failed to create sell transaction",
+    const unitsHeld = await this.instrumentRepository.getInstrumentUnits(
+      instrumentId,
+      userId,
+    );
+
+    if (units > unitsHeld) {
+      throw createHttpError.BadRequest(
+        `Insufficient units. You currently hold ${unitsHeld} units.`,
       );
     }
+
+    await this.transactionRepository.createSellTransaction({
+      userId,
+      instrumentId,
+      units,
+      price,
+      transactionDate,
+    });
   }
 
   async createDividendCashTransaction(
@@ -118,19 +119,12 @@ class TransactionService {
       { units, price, dividendSharesRatio },
     );
 
-    try {
-      await this.transactionRepository.createDividendCashTransaction({
-        userId,
-        instrumentId,
-        dividendCash,
-        transactionDate,
-      });
-    } catch (error) {
-      console.error("Create Dividend Cash Transaction Error:", error);
-      throw createHttpError.InternalServerError(
-        "Failed to create dividend cash transaction",
-      );
-    }
+    await this.transactionRepository.createDividendCashTransaction({
+      userId,
+      instrumentId,
+      dividendCash,
+      transactionDate,
+    });
   }
 
   async createDividendSharesTransaction(
@@ -142,34 +136,23 @@ class TransactionService {
       { units, price, dividendCash },
     );
 
-    try {
-      const unitsHeld = await this.transactionRepository.getInstrumentUnits(
-        instrumentId,
-        userId,
-      );
+    const unitsHeld = await this.instrumentRepository.getInstrumentUnits(
+      instrumentId,
+      userId,
+    );
 
-      if (unitsHeld <= 0) {
-        throw createHttpError.BadRequest(
-          "Cannot add dividend shares because you do not hold any units of this instrument",
-        );
-      }
-
-      await this.transactionRepository.createDividendSharesTransaction({
-        userId,
-        instrumentId,
-        dividendSharesRatio,
-        transactionDate,
-      });
-    } catch (error) {
-      if (createHttpError.isHttpError(error)) {
-        throw error;
-      }
-      console.error("Create Dividend Shares Transaction Error:", error);
-
-      throw createHttpError.InternalServerError(
-        "Failed to create dividend shares transaction",
+    if (unitsHeld <= 0) {
+      throw createHttpError.BadRequest(
+        "Cannot add dividend shares because you do not hold any units of this instrument",
       );
     }
+
+    await this.transactionRepository.createDividendSharesTransaction({
+      userId,
+      instrumentId,
+      dividendSharesRatio,
+      transactionDate,
+    });
   }
 
   validateTransactionInput(required, disallowed) {
@@ -188,6 +171,31 @@ class TransactionService {
         throw createHttpError.BadRequest(`${key} must be null`);
       }
     }
+  }
+
+  async getTransactionsByUserId({
+    userId,
+    action,
+    instrumentId,
+    date,
+    fromDate,
+    toDate,
+    page = 1,
+    limit = 10,
+  }) {
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    return await this.transactionRepository.getTransactionsByUserId({
+      userId,
+      from,
+      to,
+      action,
+      instrumentId,
+      date,
+      fromDate,
+      toDate,
+    });
   }
 }
 

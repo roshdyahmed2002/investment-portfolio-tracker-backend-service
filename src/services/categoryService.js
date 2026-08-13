@@ -1,22 +1,15 @@
-const createHttpError = require("http-errors");
+const { CategoryRepository } = require("../repository");
 
 class CategoryService {
   constructor(supaBaseClient) {
-    this.supaBaseClient = supaBaseClient;
+    this.categoryRepository = new CategoryRepository(supaBaseClient);
   }
 
   async createCategory(categoryName) {
-    const { data, error } = await this.supaBaseClient
-      .from("categories")
-      .insert({
-        name: categoryName,
-      });
+    await this.categoryRepository.createCategory(categoryName);
 
-    if (error) {
-      console.error("Create Category Error:", error);
-      throw createHttpError.InternalServerError("Failed to create category");
-    }
-    return "category created successfully";
+    return "Category Created Successfully";
   }
 }
+
 module.exports = CategoryService;

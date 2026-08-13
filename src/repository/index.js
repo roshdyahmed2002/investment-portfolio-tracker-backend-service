@@ -1,2 +1,4 @@
 const TransactionRepository = require("./transactionRepository");
-module.exports = { TransactionRepository };
+const InstrumentRepository = require("./instrumentRepository");
+const CategoryRepository = require("./categoryRepository");
+module.exports = { TransactionRepository, InstrumentRepository, CategoryRepository };

@@ -20,6 +20,16 @@ class TransactionRouter {
         ),
       ),
     );
+
+    this.router.get(
+      "/",
+      authenticate(this.supabaseClient),
+      wrapper(
+        this.transactionController.getTransactionsByUserId.bind(
+          this.transactionController,
+        ),
+      ),
+    );
   }
 }
 module.exports = TransactionRouter;
