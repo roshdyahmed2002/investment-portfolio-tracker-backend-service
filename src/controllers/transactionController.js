@@ -41,7 +41,10 @@ class TransactionController {
     return res.status(200).json({ message: result });
   }
 
-  validateTransactionBaseInput({ instrumentId, action, transactionDate }) {
+  validateTransactionBaseInput(
+    { instrumentId, action, transactionDate, transactionId },
+    isUpdate = false,
+  ) {
     if (!instrumentId) {
       throw createHttpError.BadRequest("Instrument ID is required");
     }
@@ -54,6 +57,9 @@ class TransactionController {
     }
     if (!transactionDate) {
       throw createHttpError.BadRequest("Transaction date is required");
+    }
+    if (isUpdate && !transactionId) {
+      throw createHttpError.BadRequest("Transaction ID is required");
     }
   }
 
@@ -74,6 +80,44 @@ class TransactionController {
         limit,
       });
     return res.status(200).json(responseBuilder(transactions, metaData));
+  }
+
+  async updateTransaction(req, res, next) {
+    if (!req.body) {
+      throw createHttpError.BadRequest("Request body is required");
+    }
+    const {
+      transactionId,
+      instrumentId,
+      action,
+      transactionDate,
+      units,
+      price,
+      dividendCash,
+      dividendSharesRatio,
+    } = req.body;
+    this.validateTransactionBaseInput(
+      {
+        instrumentId,
+        action,
+        transactionDate,
+        transactionId,
+      },
+      (isUpdate = true),
+    );
+    const userId = req.userId;
+    const result = await this.transactionService.updateTransaction({
+      userId,
+      transactionId,
+      instrumentId,
+      action,
+      transactionDate,
+      units,
+      price,
+      dividendCash,
+      dividendSharesRatio,
+    });
+    return res.status(200).json(responseBuilder(result));
   }
 }
 module.exports = TransactionController;

@@ -167,6 +167,39 @@ class TransactionRepository {
     }
     return { data, count };
   }
+
+  async updateTransaction({
+    userId,
+    transactionId,
+    instrumentId,
+    action,
+    transactionDate,
+    units,
+    price,
+    dividendCash,
+    dividendSharesRatio,
+  }) {
+    const { data, error } = await this.supaBaseClient.rpc(
+      "update_transaction",
+      {
+        p_user_id: userId,
+        p_transaction_id: transactionId,
+        p_instrument_id: instrumentId,
+        p_action: action,
+        p_units: units,
+        p_price: price,
+        p_dividend_cash: dividendCash,
+        p_dividend_shares_ratio: dividendSharesRatio,
+        p_txn_date: transactionDate,
+      },
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
 }
 
 module.exports = TransactionRepository;

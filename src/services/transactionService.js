@@ -249,6 +249,51 @@ class TransactionService {
       return (realizedPl / (units * price)) * 100;
     }
   }
+
+  async updateTransaction({
+    userId,
+    transactionId,
+    instrumentId,
+    action,
+    transactionDate,
+    units,
+    price,
+    dividendCash,
+    dividendSharesRatio,
+  }) {
+    if (action === TransactionAction.BUY || action === TransactionAction.SELL) {
+      this.validateTransactionInput(
+        { units, price },
+        { dividendCash, dividendSharesRatio },
+      );
+    } else if (action === TransactionAction.DIVIDEND_CASH) {
+      this.validateTransactionInput(
+        { dividendCash },
+        { units, price, dividendSharesRatio },
+      );
+    } else if (action === TransactionAction.DIVIDEND_SHARES) {
+      this.validateTransactionInput(
+        { dividendSharesRatio },
+        { units, price, dividendCash },
+      );
+    } else {
+      throw createHttpError.BadRequest("Invalid transaction action");
+    }
+
+    await this.transactionRepository.updateTransaction({
+      userId,
+      transactionId,
+      instrumentId,
+      action,
+      transactionDate,
+      units,
+      price,
+      dividendCash,
+      dividendSharesRatio,
+    });
+
+    return { message: "Transaction Updated Successfully" };
+  }
 }
 
 module.exports = TransactionService;
