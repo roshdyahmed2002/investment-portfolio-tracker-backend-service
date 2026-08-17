@@ -43,7 +43,7 @@ class TransactionController {
 
   validateTransactionBaseInput(
     { instrumentId, action, transactionDate, transactionId },
-    isUpdate = false,
+    isTransactionIdRequired = false,
   ) {
     if (!instrumentId) {
       throw createHttpError.BadRequest("Instrument ID is required");
@@ -58,7 +58,7 @@ class TransactionController {
     if (!transactionDate) {
       throw createHttpError.BadRequest("Transaction date is required");
     }
-    if (isUpdate && !transactionId) {
+    if (isTransactionIdRequired && !transactionId) {
       throw createHttpError.BadRequest("Transaction ID is required");
     }
   }
@@ -86,8 +86,8 @@ class TransactionController {
     if (!req.body) {
       throw createHttpError.BadRequest("Request body is required");
     }
+    const transactionId = req.params.id;
     const {
-      transactionId,
       instrumentId,
       action,
       transactionDate,
@@ -103,7 +103,7 @@ class TransactionController {
         transactionDate,
         transactionId,
       },
-      (isUpdate = true),
+      true,
     );
     const userId = req.userId;
     const result = await this.transactionService.updateTransaction({
@@ -116,6 +116,19 @@ class TransactionController {
       price,
       dividendCash,
       dividendSharesRatio,
+    });
+    return res.status(200).json(responseBuilder(result));
+  }
+
+  async deleteTransaction(req, res, next) {
+    const transactionId = req.params.id;
+    if (!transactionId) {
+      throw new createHttpError.BadRequest("Transaction ID is required");
+    }
+    const userId = req.userId;
+    const result = await this.transactionService.deleteTransaction({
+      userId,
+      transactionId,
     });
     return res.status(200).json(responseBuilder(result));
   }

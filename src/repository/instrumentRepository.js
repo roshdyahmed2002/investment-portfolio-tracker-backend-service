@@ -11,8 +11,6 @@ class InstrumentRepository {
       .eq("user_id", userId)
       .single();
 
-    console.log("getInstrumentUnits data:", data);
-
     if (error) {
       throw error;
     }

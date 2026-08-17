@@ -1,3 +1,5 @@
+const createHttpError = require("http-errors");
+
 class TransactionRepository {
   constructor(supaBaseClient) {
     this.supaBaseClient = supaBaseClient;
@@ -186,11 +188,31 @@ class TransactionRepository {
         p_transaction_id: transactionId,
         p_instrument_id: instrumentId,
         p_action: action,
-        p_units: units,
-        p_price: price,
-        p_dividend_cash: dividendCash,
-        p_dividend_shares_ratio: dividendSharesRatio,
+        p_dividend_cash: dividendCash ?? null,
+        p_dividend_shares_ratio: dividendSharesRatio ?? null,
+        p_units: units ?? null,
+        p_price: price ?? null,
         p_txn_date: transactionDate,
+      },
+    );
+
+    if (error) {
+      if (error.code === "P0001") {
+        throw new createHttpError.BadRequest(error.message);
+      } else {
+        throw error;
+      }
+    }
+
+    return data;
+  }
+
+  async deleteTransaction({ userId, transactionId }) {
+    const { data, error } = await this.supaBaseClient.rpc(
+      "delete_transaction",
+      {
+        p_user_id: userId,
+        p_transaction_id: transactionId,
       },
     );
 

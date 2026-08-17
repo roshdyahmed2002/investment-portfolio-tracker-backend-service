@@ -294,6 +294,15 @@ class TransactionService {
 
     return { message: "Transaction Updated Successfully" };
   }
+
+  async deleteTransaction({ userId, transactionId }) {
+    await this.transactionRepository.deleteTransaction({
+      userId,
+      transactionId,
+    });
+
+    return { message: "Transaction Deleted Successfully" };
+  }
 }
 
 module.exports = TransactionService;

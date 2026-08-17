@@ -32,10 +32,20 @@ class TransactionRouter {
     );
 
     this.router.put(
-      "/",
+      "/:id",
       authenticate(this.supabaseClient),
       wrapper(
         this.transactionController.updateTransaction.bind(
+          this.transactionController,
+        ),
+      ),
+    );
+
+    this.router.delete(
+      "/:id",
+      authenticate(this.supabaseClient),
+      wrapper(
+        this.transactionController.deleteTransaction.bind(
           this.transactionController,
         ),
       ),
