@@ -2,6 +2,7 @@ const createHttpError = require("http-errors");
 const { TransactionService } = require("../services");
 const TransactionAction = require("../constansts/transactionActions");
 const { responseBuilder } = require("../util/responseBuilder");
+const { limitValidator } = require("../util/limitValidator");
 
 class TransactionController {
   constructor(supaBaseClient) {
@@ -67,7 +68,8 @@ class TransactionController {
     const userId = req.userId;
     const { action, instrumentId, date, fromDate, toDate } = req.query;
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    let limit = Number(req.query.limit) || 10;
+    limit = limitValidator(limit);
     const { transactions, metaData } =
       await this.transactionService.getTransactionsByUserId({
         userId,

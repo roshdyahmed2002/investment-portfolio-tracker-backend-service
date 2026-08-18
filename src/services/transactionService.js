@@ -198,7 +198,7 @@ class TransactionService {
         fromDate,
         toDate,
       });
-    const transactions = this.mapTransaction(data);
+    const transactions = this.mapTransactions(data);
     const totalPages = count === null ? null : Math.ceil(count / limit);
 
     return {
@@ -212,7 +212,7 @@ class TransactionService {
     };
   }
 
-  mapTransaction(transactions) {
+  mapTransactions(transactions) {
     return transactions.map((transaction) => {
       return {
         id: transaction.id,

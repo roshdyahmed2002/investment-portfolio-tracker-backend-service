@@ -1,3 +1,5 @@
+const createHttpError = require("http-errors");
+
 class InstrumentRepository {
   constructor(supaBaseClient) {
     this.supaBaseClient = supaBaseClient;
@@ -31,6 +33,139 @@ class InstrumentRepository {
     }
 
     return data;
+  }
+
+  async getInstrumentsByUserId({
+    userId,
+    from = 0,
+    to = 10,
+    categoryId,
+    instrumentName,
+  }) {
+    console.log({ from, to });
+    let query = this.supaBaseClient
+      .from("instruments")
+      .select(
+        `
+        id,
+        name,
+        units_held,
+        realized_pl,
+        avg_buy_cost,
+        category_id,
+        categories (
+            id,
+            name
+        )
+    `,
+        { count: "exact" },
+      )
+      .eq("user_id", userId)
+      .order("category_id", { ascending: true })
+      .range(from, to);
+
+    if (categoryId) {
+      query = query.eq("category_id", categoryId);
+    }
+    if (instrumentName) {
+      query = query.ilike("name", `%${instrumentName}%`);
+    }
+
+    const { data, count, error } = await query;
+
+    if (error) {
+      if (error.code === "PGRST103") {
+        return {
+          data: [],
+          count: null,
+        };
+      }
+      throw error;
+    }
+    return { data, count };
+  }
+
+  async getInstrumentById({ userId, id }) {
+    let query = this.supaBaseClient
+      .from("instruments")
+      .select(
+        `
+        id,
+        name,
+        units_held,
+        realized_pl,
+        avg_buy_cost,
+        category_id,
+        categories (
+            id,
+            name
+        )
+    `,
+      )
+      .eq("user_id", userId)
+      .eq("id", id)
+      .maybeSingle();
+
+    const { data, error } = await query;
+
+    console.log("Data1: ", data);
+    console.log("E3: ", error);
+    if (error) {
+      throw error;
+    }
+    return { data };
+  }
+
+  async updateInstrument({ id, userId, categoryId, instrumentName }) {
+    const { data, error } = await this.supaBaseClient
+      .from("instruments")
+      .update({
+        category_id: categoryId,
+        name: instrumentName,
+      })
+      .eq("id", id)
+      .eq("user_id", userId)
+      .select(
+        `
+    id,
+    name,
+    units_held,
+    realized_pl,
+    avg_buy_cost,
+    category_id,
+    categories (
+      id,
+      name
+    )
+  `,
+      );
+    if (data.length === 0) {
+      throw new createHttpError.NotFound("Instrument not found");
+    }
+    console.log("Data: ", data);
+    console.log("E: ", error);
+    if (error) {
+      throw error;
+    }
+    return { data };
+  }
+
+  async deleteInstrument({ userId, id }) {
+    const { data, error } = await this.supaBaseClient
+      .from("instruments")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId)
+      .select("id");
+    console.log("Data1: ", data);
+    if (data.length === 0) {
+      throw new createHttpError.NotFound("Instrument not found");
+    }
+    if (error) {
+      throw error;
+    }
+
+    return { data };
   }
 }
 
