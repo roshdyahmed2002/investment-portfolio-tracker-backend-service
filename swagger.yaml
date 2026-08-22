@@ -14,6 +14,10 @@ security:
 tags:
   - name: Instruments
     description: Manage investment instruments
+  - name: Transactions
+    description: Manage investment transactions
+  - name: Categories
+    description: Manage investment categories
 
 paths:
   /instruments:
@@ -31,8 +35,529 @@ paths:
               instrumentName: SANABEL
       responses:
         '201':
-          message: Instrument Created Successfully
+          description: Instrument Created Successfully
+          content:
+            application/json:
+              example:
+                message: Instrument Created Successfully
 
+    get:
+      tags:
+        - Instruments
+      summary: Get instruments
+      description: Returns a paginated list of the user's instruments.
+      parameters:
+        - name: categoryId
+          in: query
+          required: false
+          example: 1
+        - name: instrumentName
+          in: query
+          required: false
+          example: TMG
+        - name: page
+          in: query
+          required: false
+          example: 1
+        - name: limit
+          in: query
+          required: false
+          example: 10
+      responses:
+        '200':
+          description: Instruments retrieved successfully
+          content:
+            application/json:
+              example:
+                data:
+                  - id: 7
+                    name: TMG
+                    unitsHeld: 110
+                    realizedPl: 1333.3333333333333
+                    avgBuyCost: 48.484848484848484
+                    category:
+                      id: 1
+                      name: Stock
+                  - id: 8
+                    name: EFIN
+                    unitsHeld: 140
+                    realizedPl: 2800
+                    avgBuyCost: 20
+                    category:
+                      id: 1
+                      name: Stock
+                metadata:
+                  page: 1
+                  limit: 10
+                  totalItems: 3
+                  totalPages: 1
+
+  /instruments/grouped:
+    get:
+      tags:
+        - Instruments
+      summary: Get instruments grouped by category
+      description: Returns a paginated list of the user's instruments grouped by category.
+      parameters:
+        - name: categoryId
+          in: query
+          required: false
+          example: 1
+        - name: instrumentName
+          in: query
+          required: false
+          example: TMG
+        - name: page
+          in: query
+          required: false
+          example: 1
+        - name: limit
+          in: query
+          required: false
+          example: 10
+      responses:
+        '200':
+          description: Instruments retrieved successfully
+          content:
+            application/json:
+              example:
+                data:
+                  - category:
+                      id: 1
+                      name: Stock
+                    instruments:
+                      - id: 7
+                        name: TMG
+                        unitsHeld: 110
+                        realizedPl: 1333.3333333333333
+                        avgBuyCost: 48.484848484848484
+                      - id: 8
+                        name: EFIN
+                        unitsHeld: 140
+                        realizedPl: 2800
+                        avgBuyCost: 20
+                  - category:
+                      id: 2
+                      name: Mutual Fund
+                    instruments:
+                      - id: 6
+                        name: SANABEL1
+                        unitsHeld: 0
+                        realizedPl: 46
+                        avgBuyCost: 0
+                metadata:
+                  page: 1
+                  limit: 10
+                  totalItems: 3
+                  totalPages: 1
+
+  /instruments/{id}:
+    get:
+      tags:
+        - Instruments
+      summary: Get instrument by ID
+      description: Returns a specific instrument belonging to the authenticated user.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          example: 7
+      responses:
+        '200':
+          description: Instrument retrieved successfully
+          content:
+            application/json:
+              example:
+                data:
+                  id: 7
+                  name: TMG
+                  unitsHeld: 110
+                  realizedPl: 1333.3333333333333
+                  avgBuyCost: 48.484848484848484
+                  category:
+                    id: 1
+                    name: Stock
+
+        '404':
+          description: Instrument not found
+          content:
+            application/json:
+              example:
+                status: 404
+                message: Instrument not found
+
+    put:
+      tags:
+        - Instruments
+      summary: Update an instrument
+      description: Updates the category and name of an existing instrument.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          example: 9
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              categoryId: 1
+              instrumentName: COMI
+      responses:
+        '200':
+          description: Instrument Updated Successfully
+          content:
+            application/json:
+              example:
+                message: Instrument Updated Successfully
+
+        '404':
+          description: Instrument not found
+          content:
+            application/json:
+              example:
+                status: 404
+                message: Instrument not found
+
+    delete:
+      tags:
+        - Instruments
+      summary: Delete an instrument
+      description: Deletes an instrument and its associated transactions.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          example: 9
+      responses:
+        '200':
+          description: Instrument Deleted Successfully
+          content:
+            application/json:
+              example:
+                message: Instrument Deleted Successfully
+
+        '404':
+          description: Instrument not found
+          content:
+            application/json:
+              example:
+                status: 404
+                message: Instrument not found
+
+  /transactions:
+    post:
+      tags:
+        - Transactions
+      summary: Create a transaction
+      description: Creates a new investment transaction. Supported actions are Buy, Sell, Dividend Cash, and Dividend Shares.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              instrumentId: 7
+              action: Buy
+              transactionDate: 2026-08-20
+              units: 100
+              price: 50
+      responses:
+        '200':
+          description: Transaction Created Successfully
+          content:
+            application/json:
+              example:
+                message: Transaction Created Successfully
+
+    get:
+      tags:
+        - Transactions
+      summary: Get transactions
+      description: Returns a paginated list of the user's transactions.
+      parameters:
+        - name: action
+          in: query
+          required: false
+          example: Buy
+        - name: instrumentId
+          in: query
+          required: false
+          example: 7
+        - name: date
+          in: query
+          required: false
+          example: 2026-08-20
+        - name: fromDate
+          in: query
+          required: false
+          example: 2026-08-01
+        - name: toDate
+          in: query
+          required: false
+          example: 2026-08-20
+        - name: page
+          in: query
+          required: false
+          example: 1
+        - name: limit
+          in: query
+          required: false
+          example: 10
+      responses:
+        '200':
+          description: Transactions retrieved successfully
+          content:
+            application/json:
+              example:
+                data:
+                  - id: 15
+                    txnDate: 2026-08-20
+                    action: Buy
+                    units: 100
+                    price: 50
+                    dividendCash: null
+                    dividendSharesRatio: null
+                    realizedPl: 0
+                    realizedPlPercentage: 0
+                    instrument: TMG
+                    category: Stock
+                  - id: 14
+                    txnDate: 2026-08-18
+                    action: Sell
+                    units: 20
+                    price: 55
+                    dividendCash: null
+                    dividendSharesRatio: null
+                    realizedPl: 133.33333333333334
+                    realizedPlPercentage: 12.222222222222223
+                    instrument: TMG
+                    category: Stock
+                metadata:
+                  page: 1
+                  limit: 10
+                  totalItems: 2
+                  totalPages: 1
+
+  /transactions/{id}:
+    put:
+      tags:
+        - Transactions
+      summary: Update a transaction
+      description: Updates an existing transaction and recalculates the affected instrument data.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          example: 15
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              instrumentId: 7
+              action: Buy
+              transactionDate: 2026-08-20
+              units: 120
+              price: 48
+      responses:
+        '200':
+          description: Transaction Updated Successfully
+          content:
+            application/json:
+              example:
+                data:
+                  message: Transaction Updated Successfully
+
+        '400':
+          description: Invalid transaction
+          content:
+            application/json:
+              example:
+                status: 400
+                message: Insufficient units. You currently hold 100 units.
+
+        '404':
+          description: Transaction not found
+          content:
+            application/json:
+              example:
+                status: 404
+                message: Transaction not found
+
+    delete:
+      tags:
+        - Transactions
+      summary: Delete a transaction
+      description: Deletes an existing transaction and recalculates the affected instrument data.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          example: 15
+      responses:
+        '200':
+          description: Transaction Deleted Successfully
+          content:
+            application/json:
+              example:
+                data:
+                  message: Transaction Deleted Successfully
+
+        '404':
+          description: Transaction not found
+          content:
+            application/json:
+              example:
+                status: 404
+                message: Transaction not found
+
+  /categories:
+    post:
+      tags:
+        - Categories
+      summary: Create a category
+      description: Creates a new user-defined investment category.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              categoryName: Crypto
+      responses:
+        '201':
+          description: Category Created Successfully
+          content:
+            application/json:
+              example:
+                message: Category Created Successfully
+
+    get:
+      tags:
+        - Categories
+      summary: Get categories
+      description: Returns the system categories and the authenticated user's custom categories.
+      responses:
+        '200':
+          description: Categories retrieved successfully
+          content:
+            application/json:
+              example:
+                data:
+                  categories:
+                    - id: 1
+                      name: Stock
+                    - id: 2
+                      name: Metal
+                    - id: 3
+                      name: Mutual Fund
+                    - id: 4
+                      name: Crypto
+
+  /categories/{id}:
+    get:
+      tags:
+        - Categories
+      summary: Get category by ID
+      description: Returns a specific system category or a custom category belonging to the authenticated user.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          example: 4
+      responses:
+        '200':
+          description: Category retrieved successfully
+          content:
+            application/json:
+              example:
+                data:
+                  category:
+                    id: 4
+                    name: Crypto
+
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              example:
+                status: 404
+                message: Category not found
+
+    put:
+      tags:
+        - Categories
+      summary: Update a category
+      description: Updates a user-defined investment category.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          example: 4
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              categoryName: Cryptocurrency
+      responses:
+        '200':
+          description: Category Updated Successfully
+          content:
+            application/json:
+              example:
+                data:
+                  message: Category Updated Successfully
+
+        '403':
+          description: System category cannot be modified
+          content:
+            application/json:
+              example:
+                status: 403
+                message: System categories cannot be modified
+
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              example:
+                status: 404
+                message: Category not found
+
+    delete:
+      tags:
+        - Categories
+      summary: Delete a category
+      description: Deletes a user-defined category and its associated instruments.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          example: 4
+      responses:
+        '200':
+          description: Category Deleted Successfully
+          content:
+            application/json:
+              example:
+                data:
+                  message: Category Deleted Successfully
+
+        '403':
+          description: System category cannot be deleted
+          content:
+            application/json:
+              example:
+                status: 403
+                message: System categories cannot be deleted
+
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              example:
+                status: 404
+                message: Category not found
 components:
   securitySchemes:
     bearerAuth:

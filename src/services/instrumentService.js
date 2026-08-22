@@ -1,12 +1,19 @@
 const createHttpError = require("http-errors");
 const { InstrumentRepository } = require("../repository");
+const CategoryService = require("./categoryService");
 
 class InstrumentService {
   constructor(supaBaseClient) {
     this.instrumentRepository = new InstrumentRepository(supaBaseClient);
+    this.categoryService = new CategoryService(supaBaseClient);
   }
 
   async createInstrument(userId, categoryId, instrumentName) {
+    await this.categoryService.validateCategoryAccess({
+      userId,
+      categoryId,
+    });
+
     await this.instrumentRepository.createInstrument({
       userId,
       categoryId,
@@ -15,7 +22,6 @@ class InstrumentService {
 
     return "Instrument Created Successfully";
   }
-
   async getInstrumentsByUserId({
     userId,
     categoryId,
@@ -50,14 +56,12 @@ class InstrumentService {
   }
 
   mapInstruments(instruments) {
-    console.log("I0: ", instruments);
     return instruments.map((instrument) => {
       return this.mapInstrument(instrument);
     });
   }
 
   mapInstrument(instrument) {
-    console.log("I1: ", instrument);
     return {
       id: instrument.id,
       name: instrument.name,
@@ -115,7 +119,6 @@ class InstrumentService {
 
     const groupedInstruments = [];
     for (const [key, value] of categoryMap) {
-      console.log("V1: ", value);
       const categoryName = value[0]?.categories?.name || null;
       const instruments = value.map((instrument) => {
         return {
@@ -149,12 +152,18 @@ class InstrumentService {
   }
 
   async updateInstrument({ id, userId, categoryId, instrumentName }) {
-    const { data } = await this.instrumentRepository.updateInstrument({
+    await this.categoryService.validateCategoryAccess({
+      userId,
+      categoryId,
+    });
+
+    await this.instrumentRepository.updateInstrument({
       id,
       userId,
       categoryId,
       instrumentName,
     });
+
     return {
       message: "Instrument Updated Successfully",
     };

@@ -32,13 +32,7 @@ class InstrumentController {
     const page = Number(req.query.page) || 1;
     let limit = Number(req.query.limit) || 10;
     limit = limitValidator(limit);
-    console.log({
-      userId,
-      categoryId,
-      instrumentName,
-      page,
-      limit,
-    });
+
     if (page < 1) {
       throw new createHttpError.BadRequest("Page must be greater than 0");
     }
@@ -62,13 +56,7 @@ class InstrumentController {
     const page = Number(req.query.page) || 1;
     let limit = Number(req.query.limit) || 10;
     limit = limitValidator(limit);
-    console.log({
-      userId,
-      categoryId,
-      instrumentName,
-      page,
-      limit,
-    });
+
     if (page < 1) {
       throw new createHttpError.BadRequest("Page must be greater than 0");
     }

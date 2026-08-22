@@ -1,5 +1,6 @@
 const createHttpError = require("http-errors");
 const { CategoryService } = require("../services");
+const { responseBuilder } = require("../util/responseBuilder");
 
 class CategoryController {
   constructor(supaBaseClient) {
@@ -8,12 +9,71 @@ class CategoryController {
   }
 
   async createCategory(req, res, next) {
+    const userId = req.userId;
     const { categoryName } = req.body;
+
     if (!categoryName) {
       throw createHttpError.BadRequest("Category is required");
     }
-    const result = await this.categoryService.createCategory(categoryName);
+
+    const result = await this.categoryService.createCategory(
+      userId,
+      categoryName,
+    );
+
     return res.status(200).json({ message: result });
   }
+
+  async getCategoriesByUserId(req, res, next) {
+    const userId = req.userId;
+
+    const { categories } =
+      await this.categoryService.getCategoriesByUserId(userId);
+
+    return res.status(200).json(responseBuilder(categories));
+  }
+
+  async getCategoryById(req, res, next) {
+    const userId = req.userId;
+    const id = req.params.id;
+
+    const { category } = await this.categoryService.getCategoryById({
+      userId,
+      id,
+    });
+
+    return res.status(200).json(responseBuilder(category));
+  }
+
+  async updateCategory(req, res, next) {
+    const userId = req.userId;
+    const id = req.params.id;
+    const { categoryName } = req.body;
+
+    if (!categoryName) {
+      throw createHttpError.BadRequest("Category is required");
+    }
+
+    const result = await this.categoryService.updateCategory({
+      userId,
+      id,
+      categoryName,
+    });
+
+    return res.status(200).json(responseBuilder(result));
+  }
+
+  async deleteCategory(req, res, next) {
+    const userId = req.userId;
+    const id = req.params.id;
+
+    const result = await this.categoryService.deleteCategory({
+      userId,
+      id,
+    });
+
+    return res.status(200).json(responseBuilder(result));
+  }
 }
+
 module.exports = CategoryController;

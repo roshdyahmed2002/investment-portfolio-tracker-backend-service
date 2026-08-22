@@ -1,0 +1,24 @@
+{
+  "formatVersion": 1,
+  "redactSecrets": true,
+  "scope": "database",
+  "profile": "supabase",
+  "defaultOwner": "postgres",
+  "files": [
+    "_cluster/extensions/pgcrypto.sql",
+    "_cluster/extensions/uuid-ossp.sql",
+    "public/default_privileges.sql",
+    "public/functions/create_buy_transaction.sql",
+    "public/functions/create_dividend_cash_transaction.sql",
+    "public/functions/create_dividend_shares_transaction.sql",
+    "public/functions/create_sell_transaction.sql",
+    "public/functions/delete_transaction.sql",
+    "public/functions/recalculate_instrument.sql",
+    "public/functions/update_transaction.sql",
+    "public/schema.sql",
+    "public/tables/categories.sql",
+    "public/tables/instruments.sql",
+    "public/tables/transactions.sql",
+    "public/types/transaction_action.sql"
+  ]
+}

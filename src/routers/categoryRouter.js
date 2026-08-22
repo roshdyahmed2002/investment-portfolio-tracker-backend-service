@@ -1,7 +1,8 @@
 const express = require("express");
 const { wrapper } = require("../util/wrapper");
-const { authenticate } = require("../util/middleware");
 const { CategoryController } = require("../controllers");
+const { authenticate } = require("../util/middleware");
+
 class CategoryRouter {
   constructor(supabaseClient) {
     this.supabaseClient = supabaseClient;
@@ -15,11 +16,44 @@ class CategoryRouter {
       "/",
       authenticate(this.supabaseClient),
       wrapper(
-        this.categoryController.createCategory.bind(
+        this.categoryController.createCategory.bind(this.categoryController),
+      ),
+    );
+
+    this.router.get(
+      "/",
+      authenticate(this.supabaseClient),
+      wrapper(
+        this.categoryController.getCategoriesByUserId.bind(
           this.categoryController,
         ),
       ),
     );
+
+    this.router.get(
+      "/:id",
+      authenticate(this.supabaseClient),
+      wrapper(
+        this.categoryController.getCategoryById.bind(this.categoryController),
+      ),
+    );
+
+    this.router.put(
+      "/:id",
+      authenticate(this.supabaseClient),
+      wrapper(
+        this.categoryController.updateCategory.bind(this.categoryController),
+      ),
+    );
+
+    this.router.delete(
+      "/:id",
+      authenticate(this.supabaseClient),
+      wrapper(
+        this.categoryController.deleteCategory.bind(this.categoryController),
+      ),
+    );
   }
 }
+
 module.exports = CategoryRouter;

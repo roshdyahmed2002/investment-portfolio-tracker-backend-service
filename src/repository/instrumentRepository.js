@@ -42,7 +42,6 @@ class InstrumentRepository {
     categoryId,
     instrumentName,
   }) {
-    console.log({ from, to });
     let query = this.supaBaseClient
       .from("instruments")
       .select(
@@ -108,8 +107,6 @@ class InstrumentRepository {
 
     const { data, error } = await query;
 
-    console.log("Data1: ", data);
-    console.log("E3: ", error);
     if (error) {
       throw error;
     }
@@ -142,8 +139,7 @@ class InstrumentRepository {
     if (data.length === 0) {
       throw new createHttpError.NotFound("Instrument not found");
     }
-    console.log("Data: ", data);
-    console.log("E: ", error);
+
     if (error) {
       throw error;
     }
@@ -157,7 +153,6 @@ class InstrumentRepository {
       .eq("id", id)
       .eq("user_id", userId)
       .select("id");
-    console.log("Data1: ", data);
     if (data.length === 0) {
       throw new createHttpError.NotFound("Instrument not found");
     }

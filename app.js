@@ -38,9 +38,9 @@ class App {
     const instrumentRouter = new InstrumentRouter(this.supaBaseClient);
     this.expressApp.use("/api/instruments", instrumentRouter.router);
 
-    /*     const categoryRouter = new CategoryRouter(this.supaBaseClient);
+        const categoryRouter = new CategoryRouter(this.supaBaseClient);
     this.expressApp.use("/api/categories", categoryRouter.router);
- */
+
     this.expressApp.use((req, res, next) => {
       return res.status(404).json({ status: 404, message: "Not Found" });
     });
