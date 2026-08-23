@@ -62,5 +62,3 @@ begin
 
 end;
 $function$;
-
-grant execute on function "public"."delete_transaction"(uuid, bigint) to "postgres";

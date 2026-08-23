@@ -7,15 +7,6 @@ create table "public"."categories" (
   constraint "categories_pkey" primary key ("id")
 );
 
-alter table "public"."categories"
-  enable row level security;
-
-grant delete, insert, maintain, references, select, trigger, truncate, update
-on table "public"."categories" to "postgres";
-
-grant delete, insert, select, update
-on table "public"."categories" to "service_role";
-
 create unique index "categories_system_name_unique"
 on "public"."categories" ("name")
 where "user_id" is null;

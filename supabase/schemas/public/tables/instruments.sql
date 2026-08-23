@@ -16,22 +16,4 @@ create table
       constraint "instruments_user_id_name_key" unique (user_id, name)
   );
 
-alter table "public"."instruments" enable row level security;
-
 create index idx_instruments_user on public.instruments using btree (user_id);
-
-grant delete,
-insert,
-maintain,
-references,
-select
-,
-  trigger,
-  truncate,
-update on table "public"."instruments" to "postgres";
-
-grant delete,
-insert,
-select
-,
-update on table "public"."instruments" to "service_role";

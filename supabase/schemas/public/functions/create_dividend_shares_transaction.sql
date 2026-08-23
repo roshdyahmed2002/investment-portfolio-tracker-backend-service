@@ -84,5 +84,3 @@ begin
 
 end;
 $function$;
-
-grant execute on function "public"."create_dividend_shares_transaction"(uuid, bigint, numeric, date) to "postgres";

@@ -82,5 +82,3 @@ begin
 
 end;
 $function$;
-
-grant execute on function "public"."create_buy_transaction"(uuid, bigint, numeric, numeric, date) to "postgres";

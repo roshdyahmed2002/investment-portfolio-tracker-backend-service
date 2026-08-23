@@ -120,5 +120,3 @@ begin
 
 end;
 $function$;
-
-grant execute on function "public"."update_transaction"(uuid, bigint, bigint, public.transaction_action, numeric, numeric, numeric, numeric, date) to "postgres";

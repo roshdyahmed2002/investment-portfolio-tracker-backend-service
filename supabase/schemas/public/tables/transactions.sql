@@ -15,15 +15,8 @@ create table "public"."transactions" (
 );
 
 alter table "public"."transactions"
-  enable row level security;
-
-alter table "public"."transactions"
   add column "action" public.transaction_action not null;
 
 create index idx_transactions_instrument_date on public.transactions using btree (instrument_id, txn_date, id);
 
 create index idx_transactions_user on public.transactions using btree (user_id);
-
-grant delete, insert, maintain, references, select, trigger, truncate, update on table "public"."transactions" to "postgres";
-
-grant delete, insert, select, update on table "public"."transactions" to "service_role";

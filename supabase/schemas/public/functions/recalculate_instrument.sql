@@ -163,5 +163,3 @@ begin
 
 end;
 $function$;
-
-grant execute on function "public"."recalculate_instrument"(uuid, bigint) to "postgres";
