@@ -1,7 +1,7 @@
 const createHttpError = require("http-errors");
 const { TransactionService } = require("../services");
 const TransactionAction = require("../constansts/transactionActions");
-const { responseBuilder } = require("../util/responseBuilder");
+const { responseDataBuilder } = require("../util/responseBuilder");
 const { limitValidator } = require("../util/limitValidator");
 
 class TransactionController {
@@ -81,7 +81,7 @@ class TransactionController {
         page,
         limit,
       });
-    return res.status(200).json(responseBuilder(transactions, metaData));
+    return res.status(200).json(responseDataBuilder(transactions, metaData));
   }
 
   async updateTransaction(req, res, next) {
@@ -119,7 +119,7 @@ class TransactionController {
       dividendCash,
       dividendSharesRatio,
     });
-    return res.status(200).json(responseBuilder(result));
+    return res.status(200).json(responseDataBuilder(result));
   }
 
   async deleteTransaction(req, res, next) {
@@ -132,7 +132,7 @@ class TransactionController {
       userId,
       transactionId,
     });
-    return res.status(200).json(responseBuilder(result));
+    return res.status(200).json(responseDataBuilder(result));
   }
 }
 module.exports = TransactionController;

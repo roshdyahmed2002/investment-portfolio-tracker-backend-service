@@ -1,6 +1,9 @@
 const createHttpError = require("http-errors");
 const { InstrumentService } = require("../services");
-const { responseBuilder } = require("../util/responseBuilder");
+const {
+  responseDataBuilder,
+  responseMessageBuilder,
+} = require("../util/responseBuilder");
 const { limitValidator } = require("../util/limitValidator");
 
 class InstrumentController {
@@ -47,7 +50,7 @@ class InstrumentController {
         page,
         limit,
       });
-    return res.status(200).json(responseBuilder(instruments, metaData));
+    return res.status(200).json(responseDataBuilder(instruments, metaData));
   }
 
   async getInstrumentsGroupedByCategory(req, res, next) {
@@ -71,7 +74,7 @@ class InstrumentController {
         page,
         limit,
       });
-    return res.status(200).json(responseBuilder(instruments, metaData));
+    return res.status(200).json(responseDataBuilder(instruments, metaData));
   }
 
   async getInstrumentById(req, res, next) {
@@ -82,7 +85,7 @@ class InstrumentController {
       userId,
       id,
     });
-    return res.status(200).json(responseBuilder(instrument));
+    return res.status(200).json(responseDataBuilder(instrument));
   }
 
   async updateInstrument(req, res, next) {
@@ -101,7 +104,7 @@ class InstrumentController {
       categoryId,
       instrumentName,
     });
-    return res.status(200).json(responseBuilder(result));
+    return res.status(200).json(responseDataBuilder(result));
   }
 
   async deleteInstrument(req, res, next) {
@@ -111,7 +114,20 @@ class InstrumentController {
       userId,
       id,
     });
-    return res.status(200).json(responseBuilder(result));
+    return res.status(200).json(responseDataBuilder(result));
+  }
+
+  async updateCurrentPrices(req, res, next) {
+    const userId = req.userId;
+    const { currentPrices } = req.body;
+    if (!currentPrices) {
+      throw new createHttpError.BadRequest("currentPrices is required");
+    }
+    const result = await this.instrumentService.updateCurrentPrices({
+      userId,
+      currentPrices,
+    });
+    return res.status(200).json(responseMessageBuilder(result));
   }
 }
 module.exports = InstrumentController;

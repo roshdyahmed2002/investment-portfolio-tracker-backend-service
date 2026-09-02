@@ -1,10 +1,16 @@
-function responseBuilder(data,metadata) {
+function responseDataBuilder(data, metadata) {
   const response = {
     data: data,
+  };
+  if (metadata) {
+    response.metadata = metadata;
   }
-  if(metadata){
-    response.metadata=metadata
-  }
-  return response
+  return response;
 }
-module.exports = { responseBuilder };
+function responseMessageBuilder(message) {
+  const response = {
+    message: message,
+  };
+  return response;
+}
+module.exports = { responseDataBuilder, responseMessageBuilder };

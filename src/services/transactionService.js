@@ -4,7 +4,7 @@ const {
   TransactionRepository,
   InstrumentRepository,
 } = require("../repository");
-const { responseBuilder } = require("../util/responseBuilder");
+const { responseDataBuilder } = require("../util/responseBuilder");
 
 class TransactionService {
   constructor(supaBaseClient) {

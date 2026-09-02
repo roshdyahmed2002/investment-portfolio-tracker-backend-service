@@ -178,6 +178,15 @@ class InstrumentService {
       message: "Instrument Deleted Successfully",
     };
   }
+
+  async updateCurrentPrices({ userId, currentPrices }) {
+    await this.instrumentRepository.updateCurrentPrices({
+      userId,
+      currentPrices,
+    });
+
+    return "Prices Updated Successfully"
+  }
 }
 
 module.exports = InstrumentService;

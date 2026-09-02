@@ -1,6 +1,6 @@
 const createHttpError = require("http-errors");
 const { CategoryService } = require("../services");
-const { responseBuilder } = require("../util/responseBuilder");
+const { responseDataBuilder } = require("../util/responseBuilder");
 
 class CategoryController {
   constructor(supaBaseClient) {
@@ -30,7 +30,7 @@ class CategoryController {
     const { categories } =
       await this.categoryService.getCategoriesByUserId(userId);
 
-    return res.status(200).json(responseBuilder(categories));
+    return res.status(200).json(responseDataBuilder(categories));
   }
 
   async getCategoryById(req, res, next) {
@@ -42,7 +42,7 @@ class CategoryController {
       id,
     });
 
-    return res.status(200).json(responseBuilder(category));
+    return res.status(200).json(responseDataBuilder(category));
   }
 
   async updateCategory(req, res, next) {
@@ -60,7 +60,7 @@ class CategoryController {
       categoryName,
     });
 
-    return res.status(200).json(responseBuilder(result));
+    return res.status(200).json(responseDataBuilder(result));
   }
 
   async deleteCategory(req, res, next) {
@@ -72,7 +72,7 @@ class CategoryController {
       id,
     });
 
-    return res.status(200).json(responseBuilder(result));
+    return res.status(200).json(responseDataBuilder(result));
   }
 }
 

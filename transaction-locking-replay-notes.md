@@ -278,3 +278,6 @@ All changes undone
 Locks released
 
 That's why the locking + replay logic belongs inside the PostgreSQL function: the whole workflow is atomic and protected as one transaction.
+
+## SUPA BASE CONNECTION ##
+For this project, we decided to continue using the current Supabase JS client architecture rather than switching now, since the backend and authentication/RLS setup are already built around it. We discussed that in future projects, you can instead use a normal PostgreSQL database with TypeORM, where your Node.js backend connects directly to PostgreSQL and you can write transactions, row locking, QueryBuilder, updates, deletes, and raw SQL directly in TypeORM without needing Supabase RPC functions for database operations. Supabase itself uses PostgreSQL, so it is also technically possible to connect TypeORM directly to a Supabase PostgreSQL database, but you'd need to handle authorization/RLS carefully because TypeORM connections don't automatically carry the user's Supabase JWT context.

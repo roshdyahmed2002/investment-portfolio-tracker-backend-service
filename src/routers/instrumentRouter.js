@@ -70,6 +70,16 @@ class InstrumentRouter {
         ),
       ),
     );
+
+    this.router.patch(
+      "/current-prices",
+      authenticate(this.supabaseClient),
+      wrapper(
+        this.instrumentController.updateCurrentPrices.bind(
+          this.instrumentController,
+        ),
+      ),
+    );
   }
 }
 module.exports = InstrumentRouter;

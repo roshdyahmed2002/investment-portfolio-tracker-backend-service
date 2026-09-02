@@ -5,10 +5,12 @@ const {
   AuthRouter,
   InstrumentRouter,
   CategoryRouter,
+  PortifolioRouter,
 } = require("./src/routers");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
 const path = require("path");
+const TestDataRouter = require("./src/routers/testDataRouter");
 
 class App {
   constructor(supaBaseClient) {
@@ -28,6 +30,9 @@ class App {
         swaggerUi.serve,
         swaggerUi.setup(swaggerDocument),
       );
+
+      const testDataRouter = new TestDataRouter(this.supaBaseClient);
+      this.expressApp.use("/api/test-data", testDataRouter.router);
     }
     const authRouter = new AuthRouter(this.supaBaseClient);
     this.expressApp.use("/api/auth", authRouter.router);
@@ -38,8 +43,11 @@ class App {
     const instrumentRouter = new InstrumentRouter(this.supaBaseClient);
     this.expressApp.use("/api/instruments", instrumentRouter.router);
 
-        const categoryRouter = new CategoryRouter(this.supaBaseClient);
+    const categoryRouter = new CategoryRouter(this.supaBaseClient);
     this.expressApp.use("/api/categories", categoryRouter.router);
+
+    const portifolioRouter = new PortifolioRouter(this.supaBaseClient);
+    this.expressApp.use("/api/portifolio", portifolioRouter.router);
 
     this.expressApp.use((req, res, next) => {
       return res.status(404).json({ status: 404, message: "Not Found" });

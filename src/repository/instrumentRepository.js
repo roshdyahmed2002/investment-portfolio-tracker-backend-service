@@ -162,6 +162,38 @@ class InstrumentRepository {
 
     return { data };
   }
+
+  async updateCurrentPrices({ userId, currentPrices }) {
+    currentPrices = currentPrices.map((price) => ({
+      id: price.id,
+      current_price: price.currentPrice,
+    }));
+    const { data, error } = await this.supaBaseClient.rpc(
+      "update_current_prices",
+      {
+        p_user_id: userId,
+        p_prices: currentPrices,
+      },
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    return { data };
+  }
+
+  async getPortifolioSummary(userId) {
+    const { data, error } = await this.supaBaseClient.rpc(
+      "get_portfolio_summary",
+      {
+        p_user_id: userId,
+      },
+    );
+    console.log("D1: ", data);
+    console.log("E1: ", error);
+    return data;
+  }
 }
 
 module.exports = InstrumentRepository;
